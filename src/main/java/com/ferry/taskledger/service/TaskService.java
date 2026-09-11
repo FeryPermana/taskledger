@@ -14,7 +14,9 @@ import com.ferry.taskledger.repository.ProjectMemberRepository;
 import com.ferry.taskledger.repository.ProjectRepository;
 import com.ferry.taskledger.repository.TaskRepository;
 import com.ferry.taskledger.repository.UserRepository;
+import com.ferry.taskledger.service.ActivityLogService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -26,23 +28,27 @@ public class TaskService {
     private final ProjectRepository projectRepository;
     private final UserRepository userRepository;
     private final ProjectMemberRepository projectMemberRepository;
+    private final ActivityLogService activityLogService;
 
     public TaskService(
         TaskRepository taskRepository,
         ProjectRepository projectRepository,
         UserRepository userRepository,
-        ProjectMemberRepository projectMemberRepository
+        ProjectMemberRepository projectMemberRepository,
+        ActivityLogService activityLogService
     ) {
         this.taskRepository = taskRepository;
         this.projectRepository = projectRepository;
         this.userRepository = userRepository;
         this.projectMemberRepository = projectMemberRepository;
+        this.activityLogService = activityLogService;
     }
 
     public List<Task> getAllTasks() {
         return taskRepository.findAll();
     }
 
+    @Transactional
     public Task createTask(CreateTaskRequest request) {
 
         Project project = projectRepository.findById(request.getProjectId())
@@ -108,7 +114,18 @@ public class TaskService {
         task.setDueDate(request.getDueDate());
         task.setCreatedBy(createdBy);
 
-        return taskRepository.save(task);
+        Task savedTask = taskRepository.save(task);
+
+        activityLogService.createActivityLog(
+                project.getOrganization().getId(),
+                createdBy.getId(),
+                "CREATED",
+                "TASK",
+                savedTask.getId(),
+                "Task \"" + savedTask.getTitle() + "\" created"
+        );
+
+        return savedTask;
     }
 
     public Task getTaskById(Long id) {
@@ -119,39 +136,70 @@ public class TaskService {
                 );
     }
 
+    @Transactional
     public Task updateTask(Long id, UpdateTaskRequest request) {
 
         Task task = taskRepository.findById(id)
-                .orElseThrow(() -> 
-                    new NoSuchElementException("Task not found")
+                .orElseThrow(() ->
+                        new NoSuchElementException("Task not found")
                 );
-        
+
         task.setTitle(request.getTitle());
         task.setDescription(request.getDescription());
         task.setPriority(request.getPriority());
         task.setDueDate(request.getDueDate());
 
-        return taskRepository.save(task);
+        Task savedTask = taskRepository.save(task);
+
+        activityLogService.createActivityLog(
+                task.getProject().getOrganization().getId(),
+                task.getCreatedBy().getId(),
+                "UPDATED",
+                "TASK",
+                savedTask.getId(),
+                "Task \"" + savedTask.getTitle() + "\" updated"
+        );
+
+        return savedTask;
     }
 
+    @Transactional
     public Task updateTaskStatus(Long id, UpdateTaskStatusRequest request) {
-
         Task task = taskRepository.findById(id)
-            .orElseThrow(() -> 
-                new NoSuchElementException("Task not found")
-            );
+                .orElseThrow(() ->
+                        new NoSuchElementException("Task not found")
+                );
+
+        TaskStatus oldStatus = task.getStatus();
 
         task.setStatus(request.getStatus());
 
-        return taskRepository.save(task);
+        Task savedTask = taskRepository.save(task);
+
+        activityLogService.createActivityLog(
+                task.getProject().getOrganization().getId(),
+                task.getCreatedBy().getId(),
+                "STATUS_CHANGED",
+                "TASK",
+                savedTask.getId(),
+                "Task status changed from "
+                        + oldStatus
+                        + " to "
+                        + savedTask.getStatus()
+        );
+
+        return savedTask;
     }
 
+    @Transactional
     public Task updateTaskAssignee(Long id, UpdateTaskAssigneeRequest request) {
 
         Task task = taskRepository.findById(id)
                 .orElseThrow(() ->
                         new NoSuchElementException("Task not found")
                 );
+
+        User oldAssignee = task.getAssignee();
 
         User assignee = userRepository.findById(request.getAssigneeId())
                 .orElseThrow(() ->
@@ -180,7 +228,25 @@ public class TaskService {
 
         task.setAssignee(assignee);
 
-        return taskRepository.save(task);
+        Task savedTask = taskRepository.save(task);
+
+        String oldAssigneeName = oldAssignee != null
+                ? oldAssignee.getName()
+                : "Unassigned";
+
+        activityLogService.createActivityLog(
+                task.getProject().getOrganization().getId(),
+                task.getCreatedBy().getId(),
+                "ASSIGNEE_CHANGED",
+                "TASK",
+                savedTask.getId(),
+                "Task assignee changed from "
+                        + oldAssigneeName
+                        + " to "
+                        + assignee.getName()
+        );
+
+        return savedTask;
     }
 
     public void deleteTask(Long id) {
