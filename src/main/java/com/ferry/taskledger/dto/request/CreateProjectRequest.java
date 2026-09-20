@@ -22,9 +22,6 @@ public class CreateProjectRequest {
     @FutureOrPresent(message = "Due date cannot be in the past")
     private LocalDate dueDate;
 
-    @NotNull(message = "Created by user ID is required")
-    private Long createdBy;
-
     public Long getOrganizationId() {
         return organizationId;
     }
@@ -63,13 +60,5 @@ public class CreateProjectRequest {
 
     public void setDueDate(LocalDate dueDate) {
         this.dueDate = dueDate;
-    }
-
-    public Long getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(Long createdBy) {
-        this.createdBy = createdBy;
     }
 }

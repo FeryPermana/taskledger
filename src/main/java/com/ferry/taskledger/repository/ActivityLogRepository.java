@@ -7,16 +7,16 @@ import java.util.List;
 
 public interface ActivityLogRepository extends JpaRepository<ActivityLog, Long> {
 
-    List<ActivityLog> findByEntityTypeAndEntityId(
+    List<ActivityLog> findByEntityTypeAndEntityIdOrderByCreatedAtDesc(
             String entityType,
             Long entityId
     );
 
-    List<ActivityLog> findByOrganizationId(
+    List<ActivityLog> findByOrganizationIdOrderByCreatedAtDesc(
             Long organizationId
     );
 
-    List<ActivityLog> findByUserId(
+    List<ActivityLog> findByUserIdOrderByCreatedAtDesc(
             Long userId
     );
 }

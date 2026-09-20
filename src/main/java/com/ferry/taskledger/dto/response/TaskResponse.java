@@ -16,7 +16,7 @@ public class TaskResponse {
     private TaskPriority priority;
     private Long assigneeId;
     private LocalDate dueDate;
-    private Long createdBy;
+    private Long createdById;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -29,7 +29,7 @@ public class TaskResponse {
             TaskPriority priority,
             Long assigneeId,
             LocalDate dueDate,
-            Long createdBy,
+            Long createdById,
             LocalDateTime createdAt,
             LocalDateTime updatedAt
     ) {
@@ -41,7 +41,7 @@ public class TaskResponse {
         this.priority = priority;
         this.assigneeId = assigneeId;
         this.dueDate = dueDate;
-        this.createdBy = createdBy;
+        this.createdById = createdById;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -78,8 +78,8 @@ public class TaskResponse {
         return dueDate;
     }
 
-    public Long getCreatedBy() {
-        return createdBy;
+    public Long getCreatedById() {
+        return createdById;
     }
 
     public LocalDateTime getCreatedAt() {

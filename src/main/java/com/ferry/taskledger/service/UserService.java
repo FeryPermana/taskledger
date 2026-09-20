@@ -9,6 +9,7 @@ import com.ferry.taskledger.entity.UserStatus;
 import com.ferry.taskledger.repository.OrganizationRepository;
 import com.ferry.taskledger.repository.UserRepository;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,13 +20,16 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final OrganizationRepository organizationRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public UserService(
             UserRepository userRepository,
-            OrganizationRepository organizationRepository
+            OrganizationRepository organizationRepository,
+            PasswordEncoder passwordEncoder
     ) {
         this.userRepository = userRepository;
         this.organizationRepository = organizationRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public List<User> getAllUsers() {
@@ -52,7 +56,9 @@ public class UserService {
         user.setOrganization(organization);
         user.setName(request.getName());
         user.setEmail(request.getEmail());
-        user.setPassword(request.getPassword());
+        user.setPassword(
+                passwordEncoder.encode(request.getPassword())
+        );
         user.setRole(request.getRole());
 
         // Status dikelola backend

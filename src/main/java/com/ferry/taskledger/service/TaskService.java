@@ -9,13 +9,17 @@ import com.ferry.taskledger.entity.Project;
 import com.ferry.taskledger.entity.Task;
 import com.ferry.taskledger.entity.TaskStatus;
 import com.ferry.taskledger.entity.User;
+import com.ferry.taskledger.entity.UserRole;
 import com.ferry.taskledger.entity.UserStatus;
 import com.ferry.taskledger.repository.ProjectMemberRepository;
 import com.ferry.taskledger.repository.ProjectRepository;
 import com.ferry.taskledger.repository.TaskRepository;
 import com.ferry.taskledger.repository.UserRepository;
-import com.ferry.taskledger.service.ActivityLogService;
 import org.springframework.stereotype.Service;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -24,247 +28,473 @@ import java.util.NoSuchElementException;
 @Service
 public class TaskService {
 
-    private final TaskRepository taskRepository;
-    private final ProjectRepository projectRepository;
-    private final UserRepository userRepository;
-    private final ProjectMemberRepository projectMemberRepository;
-    private final ActivityLogService activityLogService;
+        private final TaskRepository taskRepository;
+        private final ProjectRepository projectRepository;
+        private final UserRepository userRepository;
+        private final ProjectMemberRepository projectMemberRepository;
+        private final ActivityLogService activityLogService;
 
-    public TaskService(
-        TaskRepository taskRepository,
-        ProjectRepository projectRepository,
-        UserRepository userRepository,
-        ProjectMemberRepository projectMemberRepository,
-        ActivityLogService activityLogService
-    ) {
-        this.taskRepository = taskRepository;
-        this.projectRepository = projectRepository;
-        this.userRepository = userRepository;
-        this.projectMemberRepository = projectMemberRepository;
-        this.activityLogService = activityLogService;
-    }
-
-    public List<Task> getAllTasks() {
-        return taskRepository.findAll();
-    }
-
-    @Transactional
-    public Task createTask(CreateTaskRequest request) {
-
-        Project project = projectRepository.findById(request.getProjectId())
-                .orElseThrow(() ->
-                    new NoSuchElementException("Project not found")
-                );
-        
-        if(project.getOrganization().getStatus() == OrganizationStatus.INACTIVE) {
-            throw new IllegalArgumentException("Organization is inactive");
+        public TaskService(
+                        TaskRepository taskRepository,
+                        ProjectRepository projectRepository,
+                        UserRepository userRepository,
+                        ProjectMemberRepository projectMemberRepository,
+                        ActivityLogService activityLogService) {
+                this.taskRepository = taskRepository;
+                this.projectRepository = projectRepository;
+                this.userRepository = userRepository;
+                this.projectMemberRepository = projectMemberRepository;
+                this.activityLogService = activityLogService;
         }
 
-        User createdBy = userRepository.findById(request.getCreatedBy())
-                .orElseThrow(() ->
-                    new NoSuchElementException("User not found")        
-                );
+        private User getAuthenticatedUser() {
 
-        if (createdBy.getStatus() == UserStatus.INACTIVE) {
-            throw new IllegalArgumentException("User is inactive");
+                Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+                String email = authentication.getName();
+
+                return userRepository.findByEmail(email)
+                                .orElseThrow(() -> new NoSuchElementException("User not found"));
         }
 
-        if(!createdBy.getOrganization().getId().equals(project.getOrganization().getId())) {
-            throw new IllegalArgumentException(
-                "User does not belong to project organization"
-            );
+        private void validateTaskAccess(
+                        Task task,
+                        User authenticatedUser) {
+
+                UserRole role = authenticatedUser.getRole();
+
+                /*
+                 * SUPER_ADMIN dapat mengakses
+                 * seluruh task di semua organization.
+                 */
+                if (role == UserRole.SUPER_ADMIN) {
+                        return;
+                }
+
+                /*
+                 * PROJECT_MANAGER dan TEAM_LEAD hanya boleh
+                 * mengakses task dari organization mereka sendiri.
+                 */
+                if (role == UserRole.PROJECT_MANAGER
+                                || role == UserRole.TEAM_LEAD) {
+
+                        if (!task.getProject().getOrganization().getId()
+                                        .equals(authenticatedUser.getOrganization().getId())) {
+
+                                throw new AccessDeniedException(
+                                                "You do not have access to this task");
+                        }
+
+                        return;
+                }
+
+                /*
+                 * MEMBER hanya boleh mengakses task
+                 * dari project yang dia ikuti.
+                 */
+                if (role == UserRole.MEMBER) {
+
+                        boolean isProjectMember = projectMemberRepository.existsByProjectIdAndUserId(
+                                        task.getProject().getId(),
+                                        authenticatedUser.getId());
+
+                        if (!isProjectMember) {
+                                throw new AccessDeniedException(
+                                                "You do not have access to this task");
+                        }
+
+                        return;
+                }
+
+                /*
+                 * Role lain tidak memiliki akses ke task.
+                 */
+                throw new AccessDeniedException(
+                                "You do not have access to this task");
         }
 
-        User assignee = null;
+        public List<Task> getAllTasks() {
 
-        if (request.getAssigneeId() != null) {
-            assignee = userRepository.findById(request.getAssigneeId())
-                    .orElseThrow(() -> 
-                        new NoSuchElementException("Assignee not found")
-                    );
-            
-            if (assignee.getStatus() == UserStatus.INACTIVE) {
-                throw new IllegalArgumentException("Assignee is inactive");
-            }
+                User authenticatedUser = getAuthenticatedUser();
 
-            if (!assignee.getOrganization().getId().equals(project.getOrganization().getId())) {
-                throw new IllegalArgumentException(
-                    "Assignee does not belong to project organization"
-                );
-            }
+                UserRole role = authenticatedUser.getRole();
 
-            if (!projectMemberRepository.existsByProjectIdAndUserId(
-                project.getId(),
-                assignee.getId()
-            )) {
-                throw new IllegalArgumentException(
-                    "Assignee is not a member of this project"
-                );
-            }
+                /*
+                 * SUPER_ADMIN dapat melihat seluruh task
+                 * dari semua organization.
+                 */
+                if (role == UserRole.SUPER_ADMIN) {
+                        return taskRepository.findAll();
+                }
+
+                /*
+                 * PROJECT_MANAGER dan TEAM_LEAD hanya melihat
+                 * task dari project dalam organization mereka.
+                 */
+                if (role == UserRole.PROJECT_MANAGER
+                                || role == UserRole.TEAM_LEAD) {
+
+                        Long organizationId = authenticatedUser.getOrganization().getId();
+
+                        List<Long> projectIds = projectRepository
+                                        .findByOrganizationId(organizationId)
+                                        .stream()
+                                        .map(Project::getId)
+                                        .toList();
+
+                        if (projectIds.isEmpty()) {
+                                return List.of();
+                        }
+
+                        return taskRepository.findByProjectIdIn(projectIds);
+                }
+
+                /*
+                 * MEMBER hanya melihat task dari
+                 * project yang dia ikuti.
+                 */
+                if (role == UserRole.MEMBER) {
+
+                        List<Long> projectIds = projectMemberRepository
+                                        .findByUserId(authenticatedUser.getId())
+                                        .stream()
+                                        .map(projectMember -> projectMember.getProject().getId())
+                                        .toList();
+
+                        if (projectIds.isEmpty()) {
+                                return List.of();
+                        }
+
+                        return taskRepository.findByProjectIdIn(projectIds);
+                }
+
+                throw new AccessDeniedException(
+                                "You do not have access to tasks");
         }
 
-        Task task = new Task();
+        @Transactional
+        @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'PROJECT_MANAGER', 'TEAM_LEAD')")
+        public Task createTask(CreateTaskRequest request) {
 
-        task.setProject(project);
-        task.setTitle(request.getTitle());
-        task.setDescription(request.getDescription());
-        task.setStatus(TaskStatus.TODO);
-        task.setPriority(request.getPriority());
-        task.setAssignee(assignee);
-        task.setDueDate(request.getDueDate());
-        task.setCreatedBy(createdBy);
+                Project project = projectRepository.findById(request.getProjectId())
+                                .orElseThrow(() -> new NoSuchElementException("Project not found"));
 
-        Task savedTask = taskRepository.save(task);
+                if (project.getOrganization().getStatus() == OrganizationStatus.INACTIVE) {
 
-        activityLogService.createActivityLog(
-                project.getOrganization().getId(),
-                createdBy.getId(),
-                "CREATED",
-                "TASK",
-                savedTask.getId(),
-                "Task \"" + savedTask.getTitle() + "\" created"
-        );
+                        throw new IllegalArgumentException(
+                                        "Organization is inactive");
+                }
 
-        return savedTask;
-    }
+                User createdBy = getAuthenticatedUser();
 
-    public Task getTaskById(Long id) {
+                if (createdBy.getStatus() == UserStatus.INACTIVE) {
 
-        return taskRepository.findById(id)
-                .orElseThrow(() ->
-                        new NoSuchElementException("Task not found")
-                );
-    }
+                        throw new IllegalArgumentException(
+                                        "User is inactive");
+                }
 
-    @Transactional
-    public Task updateTask(Long id, UpdateTaskRequest request) {
+                if (!createdBy.getOrganization().getId()
+                                .equals(project.getOrganization().getId())) {
 
-        Task task = taskRepository.findById(id)
-                .orElseThrow(() ->
-                        new NoSuchElementException("Task not found")
-                );
+                        throw new IllegalArgumentException(
+                                        "User does not belong to project organization");
+                }
 
-        task.setTitle(request.getTitle());
-        task.setDescription(request.getDescription());
-        task.setPriority(request.getPriority());
-        task.setDueDate(request.getDueDate());
+                User assignee = null;
 
-        Task savedTask = taskRepository.save(task);
+                if (request.getAssigneeId() != null) {
 
-        activityLogService.createActivityLog(
-                task.getProject().getOrganization().getId(),
-                task.getCreatedBy().getId(),
-                "UPDATED",
-                "TASK",
-                savedTask.getId(),
-                "Task \"" + savedTask.getTitle() + "\" updated"
-        );
+                        assignee = userRepository.findById(request.getAssigneeId())
+                                        .orElseThrow(() -> new NoSuchElementException(
+                                                        "Assignee not found"));
 
-        return savedTask;
-    }
+                        if (assignee.getStatus() == UserStatus.INACTIVE) {
 
-    @Transactional
-    public Task updateTaskStatus(Long id, UpdateTaskStatusRequest request) {
-        Task task = taskRepository.findById(id)
-                .orElseThrow(() ->
-                        new NoSuchElementException("Task not found")
-                );
+                                throw new IllegalArgumentException(
+                                                "Assignee is inactive");
+                        }
 
-        TaskStatus oldStatus = task.getStatus();
+                        if (!assignee.getOrganization().getId()
+                                        .equals(project.getOrganization().getId())) {
 
-        task.setStatus(request.getStatus());
+                                throw new IllegalArgumentException(
+                                                "Assignee does not belong to project organization");
+                        }
 
-        Task savedTask = taskRepository.save(task);
+                        if (!projectMemberRepository.existsByProjectIdAndUserId(
+                                        project.getId(),
+                                        assignee.getId())) {
 
-        activityLogService.createActivityLog(
-                task.getProject().getOrganization().getId(),
-                task.getCreatedBy().getId(),
-                "STATUS_CHANGED",
-                "TASK",
-                savedTask.getId(),
-                "Task status changed from "
-                        + oldStatus
-                        + " to "
-                        + savedTask.getStatus()
-        );
+                                throw new IllegalArgumentException(
+                                                "Assignee is not a member of this project");
+                        }
+                }
 
-        return savedTask;
-    }
+                Task task = new Task();
 
-    @Transactional
-    public Task updateTaskAssignee(Long id, UpdateTaskAssigneeRequest request) {
+                task.setProject(project);
+                task.setTitle(request.getTitle());
+                task.setDescription(request.getDescription());
+                task.setStatus(TaskStatus.TODO);
+                task.setPriority(request.getPriority());
+                task.setAssignee(assignee);
+                task.setDueDate(request.getDueDate());
+                task.setCreatedBy(createdBy);
 
-        Task task = taskRepository.findById(id)
-                .orElseThrow(() ->
-                        new NoSuchElementException("Task not found")
-                );
+                Task savedTask = taskRepository.save(task);
 
-        User oldAssignee = task.getAssignee();
+                activityLogService.createActivityLog(
+                                project.getOrganization().getId(),
+                                createdBy.getId(),
+                                "CREATED",
+                                "TASK",
+                                savedTask.getId(),
+                                "Task \"" + savedTask.getTitle() + "\" created");
 
-        User assignee = userRepository.findById(request.getAssigneeId())
-                .orElseThrow(() ->
-                        new NoSuchElementException("Assignee not found")
-                );
-
-        if (assignee.getStatus() == UserStatus.INACTIVE) {
-            throw new IllegalArgumentException("Assignee is inactive");
+                return savedTask;
         }
 
-        if (!assignee.getOrganization().getId()
-                .equals(task.getProject().getOrganization().getId())) {
-            throw new IllegalArgumentException(
-                    "Assignee does not belong to project organization"
-            );
+        public Task getTaskById(Long id) {
+
+                Task task = taskRepository.findById(id)
+                                .orElseThrow(() -> new NoSuchElementException("Task not found"));
+
+                User authenticatedUser = getAuthenticatedUser();
+
+                validateTaskAccess(
+                                task,
+                                authenticatedUser);
+
+                return task;
         }
 
-        if (!projectMemberRepository.existsByProjectIdAndUserId(
-                task.getProject().getId(),
-                assignee.getId()
-        )) {
-            throw new IllegalArgumentException(
-                    "Assignee is not a member of this project"
-            );
+        @Transactional
+        @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'PROJECT_MANAGER', 'TEAM_LEAD', 'MEMBER')")
+        public Task updateTask(
+                        Long id,
+                        UpdateTaskRequest request) {
+
+                Task task = taskRepository.findById(id)
+                                .orElseThrow(() -> new NoSuchElementException("Task not found"));
+
+                User authenticatedUser = getAuthenticatedUser();
+
+                validateTaskAccess(task, authenticatedUser);
+
+                /*
+                 * MEMBER hanya boleh update task
+                 * yang di-assign kepadanya.
+                 */
+                if (authenticatedUser.getRole() == UserRole.MEMBER) {
+
+                        if (task.getAssignee() == null
+                                        || !task.getAssignee().getId()
+                                                        .equals(authenticatedUser.getId())) {
+
+                                throw new AccessDeniedException(
+                                                "You can only update your own tasks");
+                        }
+                }
+
+                task.setTitle(request.getTitle());
+                task.setDescription(request.getDescription());
+                task.setPriority(request.getPriority());
+                task.setDueDate(request.getDueDate());
+
+                Task savedTask = taskRepository.save(task);
+
+                activityLogService.createActivityLog(
+                                task.getProject().getOrganization().getId(),
+                                authenticatedUser.getId(),
+                                "UPDATED",
+                                "TASK",
+                                savedTask.getId(),
+                                "Task \"" + savedTask.getTitle() + "\" updated");
+
+                return savedTask;
         }
 
-        task.setAssignee(assignee);
+        @Transactional
+        @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'PROJECT_MANAGER', 'TEAM_LEAD', 'MEMBER')")
+        public Task updateTaskStatus(
+                        Long id,
+                        UpdateTaskStatusRequest request) {
 
-        Task savedTask = taskRepository.save(task);
+                Task task = taskRepository.findById(id)
+                                .orElseThrow(() -> new NoSuchElementException("Task not found"));
 
-        String oldAssigneeName = oldAssignee != null
-                ? oldAssignee.getName()
-                : "Unassigned";
+                User authenticatedUser = getAuthenticatedUser();
 
-        activityLogService.createActivityLog(
-                task.getProject().getOrganization().getId(),
-                task.getCreatedBy().getId(),
-                "ASSIGNEE_CHANGED",
-                "TASK",
-                savedTask.getId(),
-                "Task assignee changed from "
-                        + oldAssigneeName
-                        + " to "
-                        + assignee.getName()
-        );
+                validateTaskAccess(task, authenticatedUser);
 
-        return savedTask;
-    }
+                /*
+                 * MEMBER hanya boleh mengubah status
+                 * task yang di-assign kepadanya.
+                 */
+                if (authenticatedUser.getRole() == UserRole.MEMBER) {
 
-    public void deleteTask(Long id) {
+                        if (task.getAssignee() == null
+                                        || !task.getAssignee().getId()
+                                                        .equals(authenticatedUser.getId())) {
 
-        Task task = taskRepository.findById(id)
-            .orElseThrow(() -> 
-                new NoSuchElementException("Task not found")
-            );
+                                throw new AccessDeniedException(
+                                                "You can only change the status of your own tasks");
+                        }
+                }
 
-        taskRepository.delete(task);
-    }
+                TaskStatus oldStatus = task.getStatus();
 
-    public List<Task> getTasksByProjectId(Long projectId) {
+                task.setStatus(request.getStatus());
 
-        if (!projectRepository.existsById(projectId)) {
-            throw new NoSuchElementException("Project not found");
+                Task savedTask = taskRepository.save(task);
+
+                activityLogService.createActivityLog(
+                                task.getProject().getOrganization().getId(),
+                                authenticatedUser.getId(),
+                                "STATUS_CHANGED",
+                                "TASK",
+                                savedTask.getId(),
+                                "Task status changed from "
+                                                + oldStatus
+                                                + " to "
+                                                + savedTask.getStatus());
+
+                return savedTask;
         }
 
-        return taskRepository.findByProjectId(projectId);
-    }
+        @Transactional
+        @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'PROJECT_MANAGER', 'TEAM_LEAD')")
+        public Task updateTaskAssignee(
+                        Long id,
+                        UpdateTaskAssigneeRequest request) {
+
+                Task task = taskRepository.findById(id)
+                                .orElseThrow(() -> new NoSuchElementException("Task not found"));
+
+                User authenticatedUser = getAuthenticatedUser();
+
+                validateTaskAccess(task, authenticatedUser);
+
+                User oldAssignee = task.getAssignee();
+
+                User assignee = userRepository.findById(
+                                request.getAssigneeId())
+                                .orElseThrow(() -> new NoSuchElementException("Assignee not found"));
+
+                if (assignee.getStatus() == UserStatus.INACTIVE) {
+
+                        throw new IllegalArgumentException(
+                                        "Assignee is inactive");
+                }
+
+                if (!assignee.getOrganization().getId()
+                                .equals(task.getProject().getOrganization().getId())) {
+
+                        throw new IllegalArgumentException(
+                                        "Assignee does not belong to project organization");
+                }
+
+                if (!projectMemberRepository.existsByProjectIdAndUserId(
+                                task.getProject().getId(),
+                                assignee.getId())) {
+
+                        throw new IllegalArgumentException(
+                                        "Assignee is not a member of this project");
+                }
+
+                task.setAssignee(assignee);
+
+                Task savedTask = taskRepository.save(task);
+
+                String oldAssigneeName = oldAssignee != null
+                                ? oldAssignee.getName()
+                                : "Unassigned";
+
+                activityLogService.createActivityLog(
+                                task.getProject().getOrganization().getId(),
+                                authenticatedUser.getId(),
+                                "ASSIGNEE_CHANGED",
+                                "TASK",
+                                savedTask.getId(),
+                                "Task assignee changed from "
+                                                + oldAssigneeName
+                                                + " to "
+                                                + assignee.getName());
+
+                return savedTask;
+        }
+
+        @Transactional
+        @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'PROJECT_MANAGER', 'TEAM_LEAD')")
+        public void deleteTask(Long id) {
+                Task task = taskRepository.findById(id)
+                                .orElseThrow(() -> new NoSuchElementException("Task not found"));
+
+                User authenticatedUser = getAuthenticatedUser();
+
+                validateTaskAccess(task, authenticatedUser);
+
+                Long organizationId = task.getProject().getOrganization().getId();
+
+                Long taskId = task.getId();
+
+                String taskTitle = task.getTitle();
+
+                activityLogService.createActivityLog(
+                                organizationId,
+                                authenticatedUser.getId(),
+                                "DELETED",
+                                "TASK",
+                                taskId,
+                                "Task \"" + taskTitle + "\" deleted");
+
+                taskRepository.delete(task);
+        }
+
+        public List<Task> getTasksByProjectId(Long projectId) {
+                Project project = projectRepository.findById(projectId)
+                                .orElseThrow(() -> new NoSuchElementException("Project not found"));
+
+                User authenticatedUser = getAuthenticatedUser();
+
+                /*
+                 * SUPER_ADMIN dapat melihat task
+                 * dari project di organization mana pun.
+                 */
+                if (authenticatedUser.getRole() == UserRole.SUPER_ADMIN) {
+                        return taskRepository.findByProjectId(projectId);
+                }
+
+                /*
+                 * PROJECT_MANAGER dan TEAM_LEAD hanya boleh
+                 * melihat task dari organization mereka sendiri.
+                 */
+                if (authenticatedUser.getRole() == UserRole.PROJECT_MANAGER
+                                || authenticatedUser.getRole() == UserRole.TEAM_LEAD) {
+
+                        if (!project.getOrganization().getId()
+                                        .equals(authenticatedUser.getOrganization().getId())) {
+
+                                throw new AccessDeniedException(
+                                                "You do not have access to this project");
+                        }
+
+                        return taskRepository.findByProjectId(projectId);
+                }
+
+                /*
+                 * MEMBER hanya boleh melihat task
+                 * dari project yang dia ikuti.
+                 */
+                boolean isProjectMember = projectMemberRepository.existsByProjectIdAndUserId(
+                                project.getId(),
+                                authenticatedUser.getId());
+
+                if (!isProjectMember) {
+                        throw new AccessDeniedException(
+                                        "You do not have access to this project");
+                }
+
+                return taskRepository.findByProjectId(projectId);
+        }
 }
