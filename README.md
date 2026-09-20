@@ -1249,29 +1249,22 @@ Tahap 2 — Modul Inti
 Tahap 3 — Pelacakan Bisnis
 
 ├── Log Aktivitas
-
 └── Manajemen Transaksi
 
 Tahap 4 — Keamanan
 
 ├── Autentikasi
-
 ├── Hash Password
-
 ├── Spring Security
-
 ├── JWT
-
 └── Otorisasi Berbasis Role
 
-Tahap 5 — Peningkatan API
+Tahap 5 — Peningkatan Task & API
 
+├── Task Attachment / File Upload
 ├── Pagination
-
 ├── Search
-
 ├── Filtering
-
 └── Dashboard
 
 Tahap 6 — Kualitas & Produksi
