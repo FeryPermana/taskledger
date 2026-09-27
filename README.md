@@ -1,4 +1,4 @@
-# TaskLedger Enterprise
+**# TaskLedger Enterprise**
 
 TaskLedger Enterprise adalah sistem Manajemen Proyek & Tugas yang berfokus pada backend dan dibangun menggunakan Java dan Spring Boot.
 
@@ -6,561 +6,565 @@ Project ini dikembangkan sebagai project pembelajaran dan portofolio untuk berla
 
 Tujuannya bukan hanya membuat fungsi CRUD, tetapi juga memahami bagaimana aplikasi backend bergaya enterprise dirancang dan diorganisasi.
 
----
+\---
 
-## 🚧 Status Project
+**## ðŸš§ Status Project**
 
-**Backend Development — In Progress**
+**\*\*Backend Development â€” In Progress\*\***
 
-### Sudah Diimplementasikan
+**### Sudah Diimplementasikan**
 
-- Organization Management
+\- Organization Management
 
-- User Management
+\- User Management
 
-- Manajemen Proyek
+\- Manajemen Proyek
 
-- Project Member Management
+\- Project Member Management
 
-- Manajemen Tugas
+\- Manajemen Tugas
 
-- Task Assignment
+\- Task Assignment
 
-- Task Status Management
+\- Task Status Management
 
-- Comment Management
+\- Comment Management
 
-- Log Aktivitas
+\- Log Aktivitas
+- Task Attachment / File Upload
+- File Type Validation
+- File Size Validation (10 MB)
+- File Download / Preview Endpoint
 
-- Validasi
+\- Validasi
 
-- Global Penanganan Exception
+\- Global Penanganan Exception
 
-- DTO & Mapper Pattern
+\- DTO & Mapper Pattern
 
-- JPA / Hibernate
+\- JPA / Hibernate
 
-- Flyway Migrasi Database
+\- Flyway Migrasi Database
 
-- Standardized API Response
+\- Standardized API Response
 
-- Manajemen Transaksi
+\- Manajemen Transaksi
 
-### Sedang Dikembangkan
+**### Sedang Dikembangkan**
 
-- Autentikasi
+\- Autentikasi
 
-- Hash Password
+\- Hash Password
 
-- Spring Security
+\- Spring Security
 
-- JWT Autentikasi
+\- JWT Autentikasi
 
-- Otorisasi Berbasis Role
+\- Otorisasi Berbasis Role
 
-- Pagination
+\- Pagination
 
-- Search
+\- Search
 
-- Filtering
+\- Filtering
 
-- Dashboard
+\- Dashboard
 
-- Testing
+\- Testing
 
-- Production Konfigurasi
+\- Production Konfigurasi
 
-- Logging
+\- Logging
 
-- Vue.js Frontend Integration
+\- Vue.js Frontend Integration
 
----
+\---
 
-# 🎯 Tujuan Project
+**# ðŸŽ¯ Tujuan Project**
 
 TaskLedger Enterprise dirancang untuk mensimulasikan aplikasi internal perusahaan yang memungkinkan organisasi mengelola:
 
-- Users
+\- Users
 
-- Projects
+\- Projects
 
-- Project members
+\- Project members
 
-- Tasks
+\- Tasks
 
-- Task assignments
+\- Task assignments
 
-- Task status
+\- Task status
 
-- Comments
+\- Comments
 
-- Activity history
+\- Activity history
 
 Tujuan pembelajaran utama:
 
-- Build REST APIs using Spring Boot
+\- Build REST APIs using Spring Boot
 
-- Understand Spring Data JPA
+\- Understand Spring Data JPA
 
-- Design relational database structures
+\- Design relational database structures
 
-- Implement entity relationships
+\- Implement entity relationships
 
-- Apply business validation
+\- Apply business validation
 
-- Separate DTOs from entities
+\- Separate DTOs from entities
 
-- Implement service-layer business logic
+\- Implement service-layer business logic
 
-- Handle exceptions globally
+\- Handle exceptions globally
 
-- Manage database transactions
+\- Manage database transactions
 
-- Implement authentication and authorization
+\- Implement authentication and authorization
 
-- Write maintainable backend architecture
+\- Write maintainable backend architecture
 
-- Prepare an application for frontend integration
+\- Prepare an application for frontend integration
 
----
+\---
 
-# 🏗️ Arsitektur
+**# ðŸ—ï¸ Arsitektur**
 
 Project ini menggunakan arsitektur backend berlapis.
 
-```text
+\`\`\`text
 
 Client
 
-   │
+Â  Â â”‚
 
-   ▼
+Â  Â â–¼
 
 Controller
 
-   │
+Â  Â â”‚
 
-   ▼
+Â  Â â–¼
 
 Service
 
-   │
+Â  Â â”‚
 
-   ▼
+Â  Â â–¼
 
 Repository
 
-   │
+Â  Â â”‚
 
-   ▼
+Â  Â â–¼
 
 Database
 
-````
+\`\`\`\`
 
 Lapisan pendukung:
 
-```text
+\`\`\`text
 
 Controller
 
-    │
+Â  Â  â”‚
 
-    ├── Request DTO
+Â  Â  â”œâ”€â”€ Request DTO
 
-    │
+Â  Â  â”‚
 
-    └── Response DTO
+Â  Â  â””â”€â”€ Response DTO
 
-            │
+Â  Â  Â  Â  Â  Â  â”‚
 
-            ▼
+Â  Â  Â  Â  Â  Â  â–¼
 
-          Mapper
+Â  Â  Â  Â  Â  Mapper
 
 Service
 
-    │
+Â  Â  â”‚
 
-    ├── Aturan Bisnis
+Â  Â  â”œâ”€â”€ Aturan Bisnis
 
-    ├── Validasi
+Â  Â  â”œâ”€â”€ Validasi
 
-    └── Manajemen Transaksi
+Â  Â  â””â”€â”€ Manajemen Transaksi
 
 Repository
 
-    │
+Â  Â  â”‚
 
-    ▼
+Â  Â  â–¼
 
 JPA / Hibernate
 
-    │
+Â  Â  â”‚
 
-    ▼
+Â  Â  â–¼
 
 MySQL
 
-```
+\`\`\`
 
----
+\---
 
-# 🛠️ Teknologi yang Digunakan
+**# ðŸ› ï¸ Teknologi yang Digunakan**
 
-## Backend
+**## Backend**
 
-* Java 21
+\* Java 21
 
-* Spring Boot 4
+\* Spring Boot 4
 
-* Spring Web
+\* Spring Web
 
-* Spring Data JPA
+\* Spring Data JPA
 
-* Hibernate
+\* Hibernate
 
-* Maven
+\* Maven
 
-* Bean Validasi
+\* Bean Validasi
 
-## Database
+**## Database**
 
-* MySQL 8
+\* MySQL 8
 
-* Flyway
+\* Flyway
 
-## Tools Pengembangan
+**## Tools Pengembangan**
 
-* IntelliJ IDEA
+\* IntelliJ IDEA
 
-* Postman
+\* Postman
 
-* Git
+\* Git
 
-* GitHub
+\* GitHub
 
-## Frontend yang Direncanakan
+**## Frontend yang Direncanakan**
 
-* Vue.js
+\* Vue.js
 
----
+\---
 
-# 📦 Struktur Project
+**# ðŸ“¦ Struktur Project**
 
-```text
+\`\`\`text
 
 taskledger/
 
-│
+â”‚
 
-├── src/
+â”œâ”€â”€ src/
 
-│   ├── main/
+â”‚ Â  â”œâ”€â”€ main/
 
-│   │   ├── java/
+â”‚ Â  â”‚ Â  â”œâ”€â”€ java/
 
-│   │   │   └── com/
+â”‚ Â  â”‚ Â  â”‚ Â  â””â”€â”€ com/
 
-│   │   │       └── ferry/
+â”‚ Â  â”‚ Â  â”‚ Â  Â  Â  â””â”€â”€ ferry/
 
-│   │   │           └── taskledger/
+â”‚ Â  â”‚ Â  â”‚ Â  Â  Â  Â  Â  â””â”€â”€ taskledger/
 
-│   │   │               │
+â”‚ Â  â”‚ Â  â”‚ Â  Â  Â  Â  Â  Â  Â  â”‚
 
-│   │   │               ├── controller/
+â”‚ Â  â”‚ Â  â”‚ Â  Â  Â  Â  Â  Â  Â  â”œâ”€â”€ controller/
 
-│   │   │               ├── dto/
+â”‚ Â  â”‚ Â  â”‚ Â  Â  Â  Â  Â  Â  Â  â”œâ”€â”€ dto/
 
-│   │   │               │   ├── request/
+â”‚ Â  â”‚ Â  â”‚ Â  Â  Â  Â  Â  Â  Â  â”‚ Â  â”œâ”€â”€ request/
 
-│   │   │               │   └── response/
+â”‚ Â  â”‚ Â  â”‚ Â  Â  Â  Â  Â  Â  Â  â”‚ Â  â””â”€â”€ response/
 
-│   │   │               ├── entity/
+â”‚ Â  â”‚ Â  â”‚ Â  Â  Â  Â  Â  Â  Â  â”œâ”€â”€ entity/
 
-│   │   │               ├── mapper/
+â”‚ Â  â”‚ Â  â”‚ Â  Â  Â  Â  Â  Â  Â  â”œâ”€â”€ mapper/
 
-│   │   │               ├── repository/
+â”‚ Â  â”‚ Â  â”‚ Â  Â  Â  Â  Â  Â  Â  â”œâ”€â”€ repository/
 
-│   │   │               ├── service/
+â”‚ Â  â”‚ Â  â”‚ Â  Â  Â  Â  Â  Â  Â  â”œâ”€â”€ service/
 
-│   │   │               └── ...
+â”‚ Â  â”‚ Â  â”‚ Â  Â  Â  Â  Â  Â  Â  â””â”€â”€ ...
 
-│   │   │
+â”‚ Â  â”‚ Â  â”‚
 
-│   │   └── resources/
+â”‚ Â  â”‚ Â  â””â”€â”€ resources/
 
-│   │       ├── db/
+â”‚ Â  â”‚ Â  Â  Â  â”œâ”€â”€ db/
 
-│   │       │   └── migration/
+â”‚ Â  â”‚ Â  Â  Â  â”‚ Â  â””â”€â”€ migration/
 
-│   │       └── application.properties
+â”‚ Â  â”‚ Â  Â  Â  â””â”€â”€ application.properties
 
-│   │
+â”‚ Â  â”‚
 
-│   └── test/
+â”‚ Â  â””â”€â”€ test/
 
-│
+â”‚
 
-├── pom.xml
+â”œâ”€â”€ pom.xml
 
-├── mvnw
+â”œâ”€â”€ mvnw
 
-├── mvnw.cmd
+â”œâ”€â”€ mvnw\.cmd
 
-└── README.md
+â””â”€â”€ README.md
 
-```
+\`\`\`
 
----
+\---
 
-# 🗄️ Desain Database
+**# ðŸ—„ï¸ Desain Database**
 
 Database saat ini terdiri dari entitas utama berikut:
 
-```text
+\`\`\`text
 
 organizations
 
-      │
+Â  Â  Â  â”‚
 
-      └── users
+Â  Â  Â  â””â”€â”€ users
 
-            │
+Â  Â  Â  Â  Â  Â  â”‚
 
-            ├── projects
+Â  Â  Â  Â  Â  Â  â”œâ”€â”€ projects
 
-            │       │
+Â  Â  Â  Â  Â  Â  â”‚ Â  Â  Â  â”‚
 
-            │       ├── project_members
+Â  Â  Â  Â  Â  Â  â”‚ Â  Â  Â  â”œâ”€â”€ project\_members
 
-            │       │
+Â  Â  Â  Â  Â  Â  â”‚ Â  Â  Â  â”‚
 
-            │       └── tasks
+Â  Â  Â  Â  Â  Â  â”‚ Â  Â  Â  â””â”€â”€ tasks
 
-            │               │
+Â  Â  Â  Â  Â  Â  â”‚ Â  Â  Â  Â  Â  Â  Â  â”‚
 
-            │               └── comments
+Â  Â  Â  Â  Â  Â  â”‚ Â  Â  Â  Â  Â  Â  Â  â””â”€â”€ comments
 
-            │
+Â  Â  Â  Â  Â  Â  â”‚
 
-            └── activity_logs
+Â  Â  Â  Â  Â  Â  â””â”€â”€ activity\_logs
 
-```
+\`\`\`
 
-## Tabel Utama
+**## Tabel Utama**
 
-### Organisasi
+**### Organisasi**
 
 Menyimpan informasi organisasi.
 
-```text
+\`\`\`text
 
 organizations
 
-├── id
+â”œâ”€â”€ id
 
-├── name
+â”œâ”€â”€ name
 
-├── description
+â”œâ”€â”€ description
 
-├── status
+â”œâ”€â”€ status
 
-├── created_at
+â”œâ”€â”€ created\_at
 
-└── updated_at
+â””â”€â”€ updated\_at
 
-```
+\`\`\`
 
 Status organisasi:
 
-```text
+\`\`\`text
 
 ACTIVE
 
 INACTIVE
 
-```
+\`\`\`
 
----
+\---
 
-### Pengguna
+**### Pengguna**
 
 Menyimpan pengguna yang tergabung dalam organisasi.
 
-```text
+\`\`\`text
 
 users
 
-├── id
+â”œâ”€â”€ id
 
-├── organization_id
+â”œâ”€â”€ organization\_id
 
-├── name
+â”œâ”€â”€ name
 
-├── email
+â”œâ”€â”€ email
 
-├── password
+â”œâ”€â”€ password
 
-├── role
+â”œâ”€â”€ role
 
-├── status
+â”œâ”€â”€ status
 
-├── created_at
+â”œâ”€â”€ created\_at
 
-└── updated_at
+â””â”€â”€ updated\_at
 
-```
+\`\`\`
 
 Role pengguna:
 
-```text
+\`\`\`text
 
-SUPER_ADMIN
+SUPER\_ADMIN
 
 ADMIN
 
-PROJECT_MANAGER
+PROJECT\_MANAGER
 
-TEAM_LEAD
+TEAM\_LEAD
 
 MEMBER
 
-```
+\`\`\`
 
 Status pengguna:
 
-```text
+\`\`\`text
 
 ACTIVE
 
 INACTIVE
 
-```
+\`\`\`
 
----
+\---
 
-### Proyek
+**### Proyek**
 
 Menyimpan proyek yang dimiliki oleh organisasi.
 
-```text
+\`\`\`text
 
 projects
 
-├── id
+â”œâ”€â”€ id
 
-├── organization_id
+â”œâ”€â”€ organization\_id
 
-├── name
+â”œâ”€â”€ name
 
-├── description
+â”œâ”€â”€ description
 
-├── status
+â”œâ”€â”€ status
 
-├── start_date
+â”œâ”€â”€ start\_date
 
-├── due_date
+â”œâ”€â”€ due\_date
 
-├── created_by
+â”œâ”€â”€ created\_by
 
-├── created_at
+â”œâ”€â”€ created\_at
 
-└── updated_at
+â””â”€â”€ updated\_at
 
-```
+\`\`\`
 
 Status proyek:
 
-```text
+\`\`\`text
 
 PLANNING
 
-IN_PROGRESS
+IN\_PROGRESS
 
-ON_HOLD
+ON\_HOLD
 
 COMPLETED
 
 CANCELLED
 
-```
+\`\`\`
 
----
+\---
 
-### Anggota Proyek
+**### Anggota Proyek**
 
 Menentukan pengguna yang tergabung dalam suatu proyek.
 
-```text
+\`\`\`text
 
-project_members
+project\_members
 
-├── id
+â”œâ”€â”€ id
 
-├── project_id
+â”œâ”€â”€ project\_id
 
-├── user_id
+â”œâ”€â”€ user\_id
 
-└── created_at
+â””â”€â”€ created\_at
 
-```
+\`\`\`
 
 Seorang pengguna tidak dapat ditambahkan lebih dari satu kali ke proyek yang sama.
 
----
+\---
 
-### Tugas
+**### Tugas**
 
 Menyimpan tugas yang terkait dengan proyek.
 
-```text
+\`\`\`text
 
 tasks
 
-├── id
+â”œâ”€â”€ id
 
-├── project_id
+â”œâ”€â”€ project\_id
 
-├── title
+â”œâ”€â”€ title
 
-├── description
+â”œâ”€â”€ description
 
-├── status
+â”œâ”€â”€ status
 
-├── priority
+â”œâ”€â”€ priority
 
-├── assignee_id
+â”œâ”€â”€ assignee\_id
 
-├── due_date
+â”œâ”€â”€ due\_date
 
-├── created_by
+â”œâ”€â”€ created\_by
 
-├── created_at
+â”œâ”€â”€ created\_at
 
-└── updated_at
+â””â”€â”€ updated\_at
 
-```
+\`\`\`
 
 Status tugas:
 
-```text
+\`\`\`text
 
 TODO
 
-IN_PROGRESS
+IN\_PROGRESS
 
-IN_REVIEW
+IN\_REVIEW
 
 DONE
 
 CANCELLED
 
-```
+\`\`\`
 
 Prioritas tugas:
 
-```text
+\`\`\`text
 
 LOW
 
@@ -570,289 +574,289 @@ HIGH
 
 URGENT
 
-```
+\`\`\`
 
----
+\---
 
-### Komentar
+**### Komentar**
 
 Menyimpan komentar yang terkait dengan tugas.
 
-```text
+\`\`\`text
 
 comments
 
-├── id
+â”œâ”€â”€ id
 
-├── task_id
+â”œâ”€â”€ task\_id
 
-├── user_id
+â”œâ”€â”€ user\_id
 
-├── content
+â”œâ”€â”€ content
 
-├── created_at
+â”œâ”€â”€ created\_at
 
-└── updated_at
+â””â”€â”€ updated\_at
 
-```
+\`\`\`
 
 Hanya pengguna yang tergabung dalam proyek yang dapat menambahkan komentar pada tugasnya.
 
----
+\---
 
-### Log Aktivitas
+**### Log Aktivitas**
 
 Menyimpan aktivitas bisnis yang penting.
 
-```text
+\`\`\`text
 
-activity_logs
+activity\_logs
 
-├── id
+â”œâ”€â”€ id
 
-├── organization_id
+â”œâ”€â”€ organization\_id
 
-├── user_id
+â”œâ”€â”€ user\_id
 
-├── action
+â”œâ”€â”€ action
 
-├── entity_type
+â”œâ”€â”€ entity\_type
 
-├── entity_id
+â”œâ”€â”€ entity\_id
 
-├── description
+â”œâ”€â”€ description
 
-└── created_at
+â””â”€â”€ created\_at
 
-```
+\`\`\`
 
 Contoh:
 
-```text
+\`\`\`text
 
-action       : CREATED
+action Â  Â  Â  : CREATED
 
-entity_type  : TASK
+entity\_type Â : TASK
 
-entity_id    : 15
+entity\_id Â  Â : 15
 
-description  : Task "Implement Login API" created
+description Â : Task "Implement Login API" created
 
-```
+\`\`\`
 
 Contoh lainnya:
 
-```text
+\`\`\`text
 
-action       : STATUS_CHANGED
+action Â  Â  Â  : STATUS\_CHANGED
 
-entity_type  : TASK
+entity\_type Â : TASK
 
-entity_id    : 15
+entity\_id Â  Â : 15
 
-description  : Task status changed from TODO to IN_PROGRESS
+description Â : Task status changed from TODO to IN\_PROGRESS
 
-```
+\`\`\`
 
----
+\---
 
-# 🔐 Aturan Bisnis
+**# ðŸ” Aturan Bisnis**
 
 TaskLedger menerapkan berbagai aturan bisnis pada service layer.
 
-### Organization
+**### Organization**
 
-* Organization must exist before being referenced.
+\* Organization must exist before being referenced.
 
-* Inactive organizations cannot perform normal business operations.
+\* Inactive organizations cannot perform normal business operations.
 
-### User
+**### User**
 
-* User must belong to an organization.
+\* User must belong to an organization.
 
-* Email must be unique.
+\* Email must be unique.
 
-* Inactive users cannot perform normal operations.
+\* Inactive users cannot perform normal operations.
 
-* User status is controlled by the backend.
+\* User status is controlled by the backend.
 
-### Project
+**### Project**
 
-* Project must belong to an organization.
+\* Project must belong to an organization.
 
-* Project creator must belong to the same organization.
+\* Project creator must belong to the same organization.
 
-* Project creator must be active.
+\* Project creator must be active.
 
-* Due date cannot be earlier than start date.
+\* Due date cannot be earlier than start date.
 
-### Project Member
+**### Project Member**
 
-* User and project must exist.
+\* User and project must exist.
 
-* User must belong to the same organization as the project.
+\* User must belong to the same organization as the project.
 
-* User must be active.
+\* User must be active.
 
-* A user cannot be added twice to the same project.
+\* A user cannot be added twice to the same project.
 
-### Task
+**### Task**
 
-* Task must belong to an existing project.
+\* Task must belong to an existing project.
 
-* Task creator must belong to the project's organization.
+\* Task creator must belong to the project's organization.
 
-* Task creator must be active.
+\* Task creator must be active.
 
-* Assignee must belong to the same organization.
+\* Assignee must belong to the same organization.
 
-* Assignee must be active.
+\* Assignee must be active.
 
-* Assignee must be a member of the project.
+\* Assignee must be a member of the project.
 
-* New tasks start with `TODO`.
+\* New tasks start with \`TODO\`.
 
-* Task priority is controlled through defined enum values.
+\* Task priority is controlled through defined enum values.
 
-### Comment
+**### Comment**
 
-* Task must exist.
+\* Task must exist.
 
-* User must exist.
+\* User must exist.
 
-* User must be active.
+\* User must be active.
 
-* User must belong to the same organization as the task.
+\* User must belong to the same organization as the task.
 
-* User must be a member of the project.
+\* User must be a member of the project.
 
----
+\---
 
-# 🌐 REST API
+**# ðŸŒ REST API**
 
 URL Dasar:
 
-```text
+\`\`\`text
 
 /api
 
-```
+\`\`\`
 
 Semua API menggunakan JSON.
 
----
+\---
 
-## Organisasi
+**## Organisasi**
 
-```http
+\`\`\`http
 
-GET    /api/organizations
+GET Â  Â /api/organizations
 
-POST   /api/organizations
+POST Â  /api/organizations
 
-GET    /api/organizations/{id}
+GET Â  Â /api/organizations/{id}
 
-PUT    /api/organizations/{id}
+PUT Â  Â /api/organizations/{id}
 
 DELETE /api/organizations/{id}
 
-```
+\`\`\`
 
----
+\---
 
-## Pengguna
+**## Pengguna**
 
-```http
+\`\`\`http
 
-GET    /api/users
+GET Â  Â /api/users
 
-POST   /api/users
+POST Â  /api/users
 
-GET    /api/users/{id}
+GET Â  Â /api/users/{id}
 
-GET    /api/users/organization/{organizationId}
+GET Â  Â /api/users/organization/{organizationId}
 
-PUT    /api/users/{id}
+PUT Â  Â /api/users/{id}
 
 DELETE /api/users/{id}
 
-PATCH  /api/users/{id}/activate
+PATCH Â /api/users/{id}/activate
 
-```
+\`\`\`
 
----
+\---
 
-## Proyek
+**## Proyek**
 
-```http
+\`\`\`http
 
-GET    /api/projects
+GET Â  Â /api/projects
 
-POST   /api/projects
+POST Â  /api/projects
 
-GET    /api/projects/{id}
+GET Â  Â /api/projects/{id}
 
-PUT    /api/projects/{id}
+PUT Â  Â /api/projects/{id}
 
 DELETE /api/projects/{id}
 
-```
+\`\`\`
 
----
+\---
 
-## Anggota Proyek
+**## Anggota Proyek**
 
-```http
+\`\`\`http
 
-POST   /api/project-members
+POST Â  /api/project-members
 
-GET    /api/project-members/project/{projectId}
+GET Â  Â /api/project-members/project/{projectId}
 
 DELETE /api/project-members/project/{projectId}/user/{userId}
 
-```
+\`\`\`
 
----
+\---
 
-## Tugas
+**## Tugas**
 
-```http
+\`\`\`http
 
-GET    /api/tasks
+GET Â  Â /api/tasks
 
-POST   /api/tasks
+POST Â  /api/tasks
 
-GET    /api/tasks/{id}
+GET Â  Â /api/tasks/{id}
 
-GET    /api/tasks/project/{projectId}
+GET Â  Â /api/tasks/project/{projectId}
 
-PUT    /api/tasks/{id}
+PUT Â  Â /api/tasks/{id}
 
-PATCH  /api/tasks/{id}/status
+PATCH Â /api/tasks/{id}/status
 
-PATCH  /api/tasks/{id}/assignee
+PATCH Â /api/tasks/{id}/assignee
 
 DELETE /api/tasks/{id}
 
-```
+\`\`\`
 
----
+\---
 
-## Komentar
+**## Komentar**
 
-```http
+\`\`\`http
 
-POST   /api/comments
+POST Â  /api/comments
 
-GET    /api/comments/task/{taskId}
+GET Â  Â /api/comments/task/{taskId}
 
-```
+\`\`\`
 
----
+\---
 
-## Log Aktivitas
+**## Log Aktivitas**
 
-```http
+\`\`\`http
 
 GET /api/activity-logs/entity?entityType=TASK&entityId=1
 
@@ -860,13 +864,13 @@ GET /api/activity-logs/organization/{organizationId}
 
 GET /api/activity-logs/user/{userId}
 
-```
+\`\`\`
 
 Activity logs are intended to be generated by business operations rather than directly manipulated by the client.
 
 Currently, Task operations generate activity logs automatically for:
 
-```text
+\`\`\`text
 
 Tugas Dibuat
 
@@ -876,261 +880,261 @@ Status Tugas Diubah
 
 Penanggung Jawab Tugas Diubah
 
-```
+\`\`\`
 
----
+\---
 
-# 📄 Format Respons API
+**# ðŸ“„ Format Respons API**
 
 API menggunakan struktur respons yang terstandarisasi.
 
-## Berhasil
+**## Berhasil**
 
-```json
-
-{
-
-    "status": 200,
-
-    "message": "Success",
-
-    "data": {}
-
-}
-
-```
-
-## Error Validasi
-
-```json
+\`\`\`json
 
 {
 
-    "status": 400,
+Â  Â  "status": 200,
 
-    "message": "Validasi failed",
+Â  Â  "message": "Success",
 
-    "errors": {
-
-        "title": "Title is required"
-
-    }
+Â  Â  "data": {}
 
 }
 
-```
+\`\`\`
 
-## Error Bisnis
+**## Error Validasi**
+
+\`\`\`json
+
+{
+
+Â  Â  "status": 400,
+
+Â  Â  "message": "Validasi failed",
+
+Â  Â  "errors": {
+
+Â  Â  Â  Â  "title": "Title is required"
+
+Â  Â  }
+
+}
+
+\`\`\`
+
+**## Error Bisnis**
 
 Contoh:
 
-```json
+\`\`\`json
 
 {
 
-    "status": 400,
+Â  Â  "status": 400,
 
-    "message": "Assignee is not a member of this project",
+Â  Â  "message": "Assignee is not a member of this project",
 
-    "data": null
+Â  Â  "data": null
 
 }
 
-```
+\`\`\`
 
-## Tidak Ditemukan
+**## Tidak Ditemukan**
 
-```json
+\`\`\`json
 
 {
 
-    "status": 404,
+Â  Â  "status": 404,
 
-    "message": "Task not found",
+Â  Â  "message": "Task not found",
 
-    "data": null
+Â  Â  "data": null
 
 }
 
-```
+\`\`\`
 
----
+\---
 
-# 🧩 Pola DTO
+**# ðŸ§© Pola DTO**
 
 Project ini memisahkan request/response API dari entity JPA.
 
 Contoh:
 
-```text
+\`\`\`text
 
 Request
 
-   ↓
+Â  Â â†“
 
 CreateTaskRequest
 
-   ↓
+Â  Â â†“
 
 TaskService
 
-   ↓
+Â  Â â†“
 
 Task Entity
 
-   ↓
+Â  Â â†“
 
 TaskMapper
 
-   ↓
+Â  Â â†“
 
 TaskResponse
 
-   ↓
+Â  Â â†“
 
 Response
 
-```
+\`\`\`
 
 Hal ini mencegah entity JPA diekspos secara langsung sebagai kontrak API.
 
----
+\---
 
-# 🔄 Manajemen Transaksi
+**# ðŸ”„ Manajemen Transaksi**
 
 Operasi bisnis Task yang mengubah data Task dan Log Aktivitas menggunakan manajemen transaksi.
 
 Contoh:
 
-```text
+\`\`\`text
 
 Create Task
 
-     │
+Â  Â  Â â”‚
 
-     ├── Save Task
+Â  Â  Â â”œâ”€â”€ Save Task
 
-     │
+Â  Â  Â â”‚
 
-     └── Save Log Aktivitas
+Â  Â  Â â””â”€â”€ Save Log Aktivitas
 
-             │
+Â  Â  Â  Â  Â  Â  Â â”‚
 
-             ▼
+Â  Â  Â  Â  Â  Â  Â â–¼
 
-          COMMIT
+Â  Â  Â  Â  Â  COMMIT
 
-```
+\`\`\`
 
 Jika sebuah operasi gagal:
 
-```text
+\`\`\`text
 
-Save Task       ✅
+Save Task Â  Â  Â  âœ…
 
-Save Log        ❌
+Save Log Â  Â  Â  Â âŒ
 
-      │
+Â  Â  Â  â”‚
 
-      ▼
+Â  Â  Â  â–¼
 
-   ROLLBACK
+Â  Â ROLLBACK
 
-```
+\`\`\`
 
 Hal ini membantu menjaga konsistensi antara data bisnis dan riwayat aktivitas.
 
----
+\---
 
-# 🗃️ Migrasi Database
+**# ðŸ—ƒï¸ Migrasi Database**
 
 Perubahan struktur database dikelola menggunakan Flyway.
 
 Migrasi saat ini:
 
-```text
+\`\`\`text
 
-V1__create_organizations_table.sql
+V1\_\_create\_organizations\_table.sql
 
-V2__create_users_table.sql
+V2\_\_create\_users\_table.sql
 
-V3__create_projects_table.sql
+V3\_\_create\_projects\_table.sql
 
-V4__create_project_members_table.sql
+V4\_\_create\_project\_members\_table.sql
 
-V5__create_tasks_table.sql
+V5\_\_create\_tasks\_table.sql
 
-V6__create_comments_table.sql
+V6\_\_create\_comments\_table.sql
 
-V7__create_activity_logs_table.sql
+V7\_\_create\_activity\_logs\_table.sql
 
-```
+\`\`\`
 
 Flyway memastikan migrasi database memiliki versi dan dijalankan secara berurutan.
 
----
+\---
 
-# 🚀 Menjalankan Project
+**# ðŸš€ Menjalankan Project**
 
-## Persyaratan
+**## Persyaratan**
 
 Pastikan tersedia:
 
-* Java 21
+\* Java 21
 
-* MySQL 8
+\* MySQL 8
 
-* Maven or Maven Wrapper
+\* Maven or Maven Wrapper
 
-* Git
+\* Git
 
----
+\---
 
-## 1. Clone Repository
+**## 1. Clone Repository**
 
-```bash
+\`\`\`bash
 
-git clone https://github.com/FeryPermana/taskledger.git
+git clone https\://github.com/FeryPermana/taskledger.git
 
-```
+\`\`\`
 
-```bash
+\`\`\`bash
 
 cd taskledger
 
-```
+\`\`\`
 
----
+\---
 
-## 2. Membuat Database
+**## 2. Membuat Database**
 
 Buat database MySQL:
 
-```sql
+\`\`\`sql
 
 CREATE DATABASE taskledger;
 
-```
+\`\`\`
 
----
+\---
 
-## 3. Konfigurasi Database
+**## 3. Konfigurasi Database**
 
 Ubah:
 
-```text
+\`\`\`text
 
 src/main/resources/application.properties
 
-```
+\`\`\`
 
 Contoh:
 
-```properties
+\`\`\`properties
 
 spring.application.name=taskledger
 
-spring.datasource.url=jdbc:mysql://localhost:3306/taskledger
+spring.datasource.url=jdbc\:mysql://localhost:3306/taskledger
 
 spring.datasource.username=root
 
@@ -1140,244 +1144,260 @@ spring.jpa.hibernate.ddl-auto=validate
 
 spring.jpa.show-sql=true
 
-```
+\`\`\`
 
----
+\---
 
-## 4. Menjalankan Aplikasi
+**## 4. Menjalankan Aplikasi**
 
 Windows:
 
-```powershell
+\`\`\`powershell
 
-.\mvnw.cmd spring-boot:run
+.\mvnw\.cmd spring-boot\:run
 
-```
+\`\`\`
 
 Atau:
 
-```bash
+\`\`\`bash
 
-./mvnw spring-boot:run
+./mvnw spring-boot\:run
 
-```
+\`\`\`
 
 Aplikasi berjalan di:
 
-```text
+\`\`\`text
 
-http://localhost:8080
+http\://localhost:8080
 
-```
+\`\`\`
 
----
+\---
 
-# 🧪 Pengujian
+**# ðŸ§ª Pengujian**
 
 Endpoint API saat ini diuji secara manual menggunakan Postman.
 
 Pengujian mencakup:
 
-* Valid requests
+\* Valid requests
 
-* Validasi errors
+\* Validasi errors
 
-* Resource not found
+\* Resource not found
 
-* Duplicate data
+\* Duplicate data
 
-* Inactive users
+\* Inactive users
 
-* Inactive organizations
+\* Inactive organizations
 
-* Organization consistency
+\* Organization consistency
 
-* Project membership
+\* Project membership
 
-* Task assignment
+\* Task assignment
 
-* Task status changes
+\* Task status changes
 
-* Comment access
+\* Comment access
 
-* Activity log generation
+\* Activity log generation
+* Authentication / JWT
+* Role-based authorization
+* Task attachment upload
+* File type validation
+* File size validation
+* Attachment download / preview
+* Attachment deletion and physical file cleanup
 
 Pengujian otomatis akan dikembangkan seiring kemajuan project.
 
----
+\---
 
-# 🛣️ Roadmap Pengembangan
+**# ðŸ›£ï¸ Roadmap Pengembangan**
 
 Project dikembangkan secara bertahap.
 
-```text
+\`\`\`text
 
-Tahap 1 — Fondasi
+Tahap 1 â€” Fondasi
 
-├── Setup Project
+â”œâ”€â”€ Setup Project
 
-├── Spring Boot
+â”œâ”€â”€ Spring Boot
 
-├── JPA
+â”œâ”€â”€ JPA
 
-├── Flyway
+â”œâ”€â”€ Flyway
 
-├── DTO
+â”œâ”€â”€ DTO
 
-├── Mapper
+â”œâ”€â”€ Mapper
 
-├── Validasi
+â”œâ”€â”€ Validasi
 
-├── Penanganan Exception
+â”œâ”€â”€ Penanganan Exception
 
-└── Respons API Terstandarisasi
+â””â”€â”€ Respons API Terstandarisasi
 
-Tahap 2 — Modul Inti
+Tahap 2 â€” Modul Inti
 
-├── Organization
+â”œâ”€â”€ Organization
 
-├── User
+â”œâ”€â”€ User
 
-├── Project
+â”œâ”€â”€ Project
 
-├── Project Member
+â”œâ”€â”€ Project Member
 
-├── Task
+â”œâ”€â”€ Task
 
-└── Comment
+â””â”€â”€ Comment
 
-Tahap 3 — Pelacakan Bisnis
+Tahap 3 â€” Pelacakan Bisnis
 
-├── Log Aktivitas
-└── Manajemen Transaksi
+â”œâ”€â”€ Log Aktivitas
 
-Tahap 4 — Keamanan
+â””â”€â”€ Manajemen Transaksi
 
-├── Autentikasi
-├── Hash Password
-├── Spring Security
-├── JWT
-└── Otorisasi Berbasis Role
+Tahap 4 â€” Keamanan
 
-Tahap 5 — Peningkatan Task & API
+â”œâ”€â”€ Autentikasi
 
-├── Task Attachment / File Upload
-├── Pagination
-├── Search
-├── Filtering
-└── Dashboard
+â”œâ”€â”€ Hash Password
 
-Tahap 6 — Kualitas & Produksi
+â”œâ”€â”€ Spring Security
 
-├── Pengujian Otomatis
+â”œâ”€â”€ JWT
 
-├── Konfigurasi
+â””â”€â”€ Otorisasi Berbasis Role
 
-├── Logging
+Tahap 5 â€” Peningkatan Task & API
 
-└── Penguatan untuk Produksi
+â”œâ”€â”€ Task Attachment / File Upload
 
-Tahap 7 — Frontend
+â”œâ”€â”€ Pagination
 
-├── Vue.js
+â”œâ”€â”€ Search
 
-├── Autentikasi Integration
+â”œâ”€â”€ Filtering
 
-├── Dashboard
+â””â”€â”€ Dashboard
 
-├── Manajemen Proyek
+Tahap 6 â€” Kualitas & Produksi
 
-└── Manajemen Tugas
+â”œâ”€â”€ Pengujian Otomatis
 
-```
+â”œâ”€â”€ Konfigurasi
 
----
+â”œâ”€â”€ Logging
 
-# 📚 Yang Sedang Dipelajari
+â””â”€â”€ Penguatan untuk Produksi
+
+Tahap 7 â€” Frontend
+
+â”œâ”€â”€ Vue.js
+
+â”œâ”€â”€ Autentikasi Integration
+
+â”œâ”€â”€ Dashboard
+
+â”œâ”€â”€ Manajemen Proyek
+
+â””â”€â”€ Manajemen Tugas
+
+\`\`\`
+
+\---
+
+**# ðŸ“š Yang Sedang Dipelajari**
 
 Melalui project ini, saya sedang mempraktikkan:
 
-### Spring Boot
+**### Spring Boot**
 
-* REST Controller
+\* REST Controller
 
-* Dependency Injection
+\* Dependency Injection
 
-* Service Layer
+\* Service Layer
 
-* Repository Layer
+\* Repository Layer
 
-* Konfigurasi
+\* Konfigurasi
 
-### Spring Data JPA
+**### Spring Data JPA**
 
-* Pemetaan Entity
+\* Pemetaan Entity
 
-* `@ManyToOne`
+\* \`@ManyToOne\`
 
-* Relasi
+\* Relasi
 
-* Query Method Repository
+\* Query Method Repository
 
-* Lazy Loading
+\* Lazy Loading
 
-### Database
+**### Database**
 
-* Desain Database Relasional
+\* Desain Database Relasional
 
-* Foreign Key
+\* Foreign Key
 
-* Unique Constraint
+\* Unique Constraint
 
-* Index
+\* Index
 
-* Migrasi Database
+\* Migrasi Database
 
-* Flyway
+\* Flyway
 
-### Arsitektur Backend
+**### Arsitektur Backend**
 
-* Arsitektur Berlapis
+\* Arsitektur Berlapis
 
-* DTO Pattern
+\* DTO Pattern
 
-* Mapper Pattern
+\* Mapper Pattern
 
-* Aturan Bisnis
+\* Aturan Bisnis
 
-* Penanganan Exception
+\* Penanganan Exception
 
-* Manajemen Transaksi
+\* Manajemen Transaksi
 
-### Pengembangan API
+**### Pengembangan API**
 
-* REST API
+\* REST API
 
-* HTTP Method
+\* HTTP Method
 
-* HTTP Status Code
+\* HTTP Status Code
 
-* Validasi
+\* Validasi
 
-* Respons API Terstandarisasi
+\* Respons API Terstandarisasi
 
-### Keamanan — Direncanakan
+**### Keamanan â€” Sudah Diimplementasikan**
 
-* Hash Password
+\* Hash Password
 
-* Spring Security
+\* Spring Security
 
-* Autentikasi
+\* Autentikasi
 
-* JWT
+\* JWT
 
-* Authorization
+\* Authorization
 
-* Role-Based Access Control
+\* Role-Based Access Control
 
----
+\---
 
-# 💡 Pendekatan Pengembangan
+**# ðŸ’¡ Pendekatan Pengembangan**
 
 Project ini sengaja dikembangkan secara bertahap.
 
@@ -1385,102 +1405,91 @@ Daripada mengimplementasikan semua fitur sekaligus, setiap modul dibangun dan di
 
 Prinsip pengembangannya adalah:
 
-```text
+\`\`\`text
 
 Understand
 
-    ↓
+Â  Â  â†“
 
 Design
 
-    ↓
+Â  Â  â†“
 
 Implement
 
-    ↓
+Â  Â  â†“
 
 Test
 
-    ↓
+Â  Â  â†“
 
 Refactor
 
-    ↓
+Â  Â  â†“
 
 Move to next module
 
-```
+\`\`\`
 
 Tujuannya adalah membangun pemahaman backend yang kuat, bukan sekadar menyelesaikan tutorial.
 
----
+\---
 
-# 📈 Progress Saat Ini
+**# ðŸ“ˆ Progress Saat Ini
 
 ```text
-
-Organization          ████████████████████ 100%
-
-User                  ████████████████████ 100%
-
-Project               ████████████████████ 100%
-
-Project Member        ████████████████████ 100%
-
-Task                  ████████████████████ 100%
-
-Comment               ████████████████████ 100%
-
-Log Aktivitas          ████████████████████ 100%
-
-Transaction           ████████████████████ 100%
-
-Autentikasi        ░░░░░░░░░░░░░░░░░░░░   0%
-
-JWT                   ░░░░░░░░░░░░░░░░░░░░   0%
-
-Authorization         ░░░░░░░░░░░░░░░░░░░░   0%
-
-Pagination             ░░░░░░░░░░░░░░░░░░░░   0%
-
-Search                ░░░░░░░░░░░░░░░░░░░░   0%
-
-Filtering             ░░░░░░░░░░░░░░░░░░░░   0%
-
-Dashboard             ░░░░░░░░░░░░░░░░░░░░   0%
-
-Testing               ░░░░░░░░░░░░░░░░░░░░   0%
-
-Vue.js Frontend       ░░░░░░░░░░░░░░░░░░░░   0%
-
+Organization             â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ 100%
+User                     â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ 100%
+Project                  â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ 100%
+Project Member           â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ 100%
+Task                     â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ 100%
+Comment                  â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ 100%
+Log Aktivitas             â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ 100%
+Transaction               â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ 100%
+Authentication            â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ 100%
+Password Hashing          â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ 100%
+Spring Security           â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ 100%
+JWT                       â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ 100%
+Authorization / RBAC      â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ 100%
+Task Attachment           â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ 100%
+File Upload               â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ 100%
+File Download / Preview   â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ 100%
+Pagination                â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘   0%
+Search                    â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘   0%
+Filtering                 â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘   0%
+Dashboard                 â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘   0%
+Automated Testing         â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘   0%
+Production Hardening      â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘   0%
+Vue.js Frontend           â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘   0%
+Frontend Integration      â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘â–‘   0%
 ```
 
 > Progress menunjukkan tahap pengembangan project saat ini dan akan berubah seiring implementasi modul baru.
 
 ---
 
-# 🔗 Repository
+# ðŸ”— Repository**
 
 GitHub:
 
-[https://github.com/FeryPermana/taskledger](https://github.com/FeryPermana/taskledger)
+[https\://github.com/FeryPermana/taskledger]\(https\://github.com/FeryPermana/taskledger)
 
----
+\---
 
-# 👨‍💻 Pengembang
+**# ðŸ‘¨â€ðŸ’» Pengembang**
 
-**Muhammad Pandi Ferry Permana**
+**\*\*Muhammad Pandi Ferry Permana\*\***
 
 Full Stack Web Developer
 
 Berfokus pada PHP, Laravel, Vue.js, dan saat ini memperluas keahlian backend dengan Java & Spring Boot.
 
----
+\---
 
-# 📌 Catatan
+**# ðŸ“Œ Catatan**
 
 TaskLedger Enterprise adalah project pembelajaran dan portofolio yang masih terus dikembangkan.
 
 Arsitektur, aturan bisnis, API, dan implementasi dapat berkembang seiring dipelajarinya konsep baru dan aplikasi menjadi semakin lengkap.
 
-```
+\`\`\`

@@ -18,144 +18,187 @@ import java.util.NoSuchElementException;
 @Service
 public class ActivityLogService {
 
-        private final ActivityLogRepository activityLogRepository;
-        private final OrganizationRepository organizationRepository;
-        private final UserRepository userRepository;
+    private final ActivityLogRepository activityLogRepository;
+    private final OrganizationRepository organizationRepository;
+    private final UserRepository userRepository;
 
-        public ActivityLogService(
-                        ActivityLogRepository activityLogRepository,
-                        OrganizationRepository organizationRepository,
-                        UserRepository userRepository) {
-                this.activityLogRepository = activityLogRepository;
-                this.organizationRepository = organizationRepository;
-                this.userRepository = userRepository;
+    public ActivityLogService(
+            ActivityLogRepository activityLogRepository,
+            OrganizationRepository organizationRepository,
+            UserRepository userRepository
+    ) {
+        this.activityLogRepository = activityLogRepository;
+        this.organizationRepository = organizationRepository;
+        this.userRepository = userRepository;
+    }
+
+    public ActivityLog createActivityLog(
+            Long organizationId,
+            Long userId,
+            String action,
+            String entityType,
+            Long entityId,
+            String description
+    ) {
+
+        Organization organization = organizationRepository.findById(organizationId)
+                .orElseThrow(() ->
+                        new NoSuchElementException("Organization not found")
+                );
+
+        User user = null;
+
+        if (userId != null) {
+
+            user = userRepository.findById(userId)
+                    .orElseThrow(() ->
+                            new NoSuchElementException("User not found")
+                    );
+
+            /*
+             * SUPER_ADMIN bersifat global.
+             * Jadi SUPER_ADMIN boleh menjadi actor
+             * untuk activity di organization mana pun.
+             *
+             * User selain SUPER_ADMIN harus berasal
+             * dari organization yang sama.
+             */
+            if (user.getRole() != UserRole.SUPER_ADMIN
+                    && !user.getOrganization()
+                            .getId()
+                            .equals(organization.getId())) {
+
+                throw new IllegalArgumentException(
+                        "User does not belong to organization"
+                );
+            }
         }
 
-        public ActivityLog createActivityLog(
-                        Long organizationId,
-                        Long userId,
-                        String action,
-                        String entityType,
-                        Long entityId,
-                        String description) {
+        ActivityLog activityLog = new ActivityLog();
 
-                Organization organization = organizationRepository.findById(organizationId)
-                                .orElseThrow(() -> new NoSuchElementException("Organization not found"));
+        activityLog.setOrganization(organization);
+        activityLog.setUser(user);
+        activityLog.setAction(action);
+        activityLog.setEntityType(entityType);
+        activityLog.setEntityId(entityId);
+        activityLog.setDescription(description);
 
-                User user = null;
+        return activityLogRepository.save(activityLog);
+    }
 
-                if (userId != null) {
+    public List<ActivityLog> getByEntity(
+            String entityType,
+            Long entityId
+    ) {
 
-                        user = userRepository.findById(userId)
-                                        .orElseThrow(() -> new NoSuchElementException("User not found"));
+        User authenticatedUser = getAuthenticatedUser();
 
-                        if (!user.getOrganization().getId()
-                                        .equals(organization.getId())) {
+        List<ActivityLog> logs = activityLogRepository
+                .findByEntityTypeAndEntityIdOrderByCreatedAtDesc(
+                        entityType,
+                        entityId
+                );
 
-                                throw new IllegalArgumentException(
-                                                "User does not belong to organization");
-                        }
-                }
-
-                ActivityLog activityLog = new ActivityLog();
-
-                activityLog.setOrganization(organization);
-                activityLog.setUser(user);
-                activityLog.setAction(action);
-                activityLog.setEntityType(entityType);
-                activityLog.setEntityId(entityId);
-                activityLog.setDescription(description);
-
-                return activityLogRepository.save(activityLog);
+        if (logs.isEmpty()) {
+            return List.of();
         }
 
-        public List<ActivityLog> getByEntity(
-                        String entityType,
-                        Long entityId) {
+        Long organizationId = logs.get(0)
+                .getOrganization()
+                .getId();
 
-                User authenticatedUser = getAuthenticatedUser();
+        validateOrganizationAccess(
+                organizationId,
+                authenticatedUser
+        );
 
-                List<ActivityLog> logs = activityLogRepository
-                                .findByEntityTypeAndEntityIdOrderByCreatedAtDesc(
-                                                entityType,
-                                                entityId);
+        return logs;
+    }
 
-                if (logs.isEmpty()) {
-                        return List.of();
-                }
+    public List<ActivityLog> getByOrganization(
+            Long organizationId
+    ) {
 
-                Long organizationId = logs.get(0)
-                                .getOrganization()
-                                .getId();
-
-                validateOrganizationAccess(
-                                organizationId,
-                                authenticatedUser);
-
-                return logs;
+        if (!organizationRepository.existsById(organizationId)) {
+            throw new NoSuchElementException(
+                    "Organization not found"
+            );
         }
 
-        public List<ActivityLog> getByOrganization(
-                        Long organizationId) {
+        User authenticatedUser = getAuthenticatedUser();
 
-                if (!organizationRepository.existsById(organizationId)) {
-                        throw new NoSuchElementException(
-                                        "Organization not found");
-                }
+        validateOrganizationAccess(
+                organizationId,
+                authenticatedUser
+        );
 
-                User authenticatedUser = getAuthenticatedUser();
+        return activityLogRepository
+                .findByOrganizationIdOrderByCreatedAtDesc(
+                        organizationId
+                );
+    }
 
-                validateOrganizationAccess(
-                                organizationId,
-                                authenticatedUser);
+    public List<ActivityLog> getByUser(
+            Long userId
+    ) {
 
-                return activityLogRepository
-                                .findByOrganizationIdOrderByCreatedAtDesc(
-                                                organizationId);
+        User targetUser = userRepository.findById(userId)
+                .orElseThrow(() ->
+                        new NoSuchElementException("User not found")
+                );
+
+        User authenticatedUser = getAuthenticatedUser();
+
+        validateOrganizationAccess(
+                targetUser.getOrganization().getId(),
+                authenticatedUser
+        );
+
+        return activityLogRepository
+                .findByUserIdOrderByCreatedAtDesc(
+                        userId
+                );
+    }
+
+    private User getAuthenticatedUser() {
+
+        Authentication authentication =
+                SecurityContextHolder
+                        .getContext()
+                        .getAuthentication();
+
+        String email = authentication.getName();
+
+        return userRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new NoSuchElementException("User not found")
+                );
+    }
+
+    private void validateOrganizationAccess(
+            Long organizationId,
+            User authenticatedUser
+    ) {
+
+        /*
+         * SUPER_ADMIN bersifat global.
+         * Bisa melihat activity log organization mana pun.
+         */
+        if (authenticatedUser.getRole() == UserRole.SUPER_ADMIN) {
+            return;
         }
 
-        public List<ActivityLog> getByUser(
-                        Long userId) {
+        /*
+         * Role lain hanya boleh mengakses
+         * organization miliknya sendiri.
+         */
+        if (!authenticatedUser.getOrganization()
+                .getId()
+                .equals(organizationId)) {
 
-                User targetUser = userRepository.findById(userId)
-                                .orElseThrow(() -> new NoSuchElementException("User not found"));
-
-                User authenticatedUser = getAuthenticatedUser();
-
-                validateOrganizationAccess(
-                                targetUser.getOrganization().getId(),
-                                authenticatedUser);
-
-                return activityLogRepository
-                                .findByUserIdOrderByCreatedAtDesc(
-                                                userId);
+            throw new AccessDeniedException(
+                    "You do not have access to these activity logs"
+            );
         }
-
-        private User getAuthenticatedUser() {
-
-                Authentication authentication = SecurityContextHolder.getContext()
-                                .getAuthentication();
-
-                String email = authentication.getName();
-
-                return userRepository.findByEmail(email)
-                                .orElseThrow(() -> new NoSuchElementException("User not found"));
-        }
-
-        private void validateOrganizationAccess(
-                        Long organizationId,
-                        User authenticatedUser) {
-
-                if (authenticatedUser.getRole() == UserRole.SUPER_ADMIN) {
-                        return;
-                }
-
-                if (!authenticatedUser.getOrganization()
-                                .getId()
-                                .equals(organizationId)) {
-
-                        throw new AccessDeniedException(
-                                        "You do not have access to these activity logs");
-                }
-        }
+    }
 }

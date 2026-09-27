@@ -6,6 +6,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import com.ferry.taskledger.response.ApiResponse;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -69,6 +72,21 @@ public class GlobalExceptionHandler {
                         400,
                         "Invalid request body",
                         null
+                );
+        }
+
+        @ExceptionHandler(MaxUploadSizeExceededException.class)
+        public ResponseEntity<ApiResponse<Void>> handleMaxUploadSizeExceeded(
+                MaxUploadSizeExceededException exception
+        ) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(
+                        new ApiResponse<>(
+                                400,
+                                "File size exceeds the maximum allowed size of 10MB",
+                                null
+                        )
                 );
         }
 }
