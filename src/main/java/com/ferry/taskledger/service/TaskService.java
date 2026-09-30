@@ -8,6 +8,7 @@ import com.ferry.taskledger.entity.OrganizationStatus;
 import com.ferry.taskledger.entity.Project;
 import com.ferry.taskledger.entity.Task;
 import com.ferry.taskledger.entity.TaskStatus;
+import com.ferry.taskledger.entity.TaskPriority;
 import com.ferry.taskledger.entity.User;
 import com.ferry.taskledger.entity.UserRole;
 import com.ferry.taskledger.entity.UserStatus;
@@ -21,6 +22,10 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import com.ferry.taskledger.specification.TaskSpecification;
+import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -63,36 +68,13 @@ public class TaskService {
 
                 UserRole role = authenticatedUser.getRole();
 
-                /*
-                 * SUPER_ADMIN dapat mengakses
-                 * seluruh task di semua organization.
-                 */
                 if (role == UserRole.SUPER_ADMIN) {
                         return;
                 }
 
-                /*
-                 * PROJECT_MANAGER dan TEAM_LEAD hanya boleh
-                 * mengakses task dari organization mereka sendiri.
-                 */
                 if (role == UserRole.PROJECT_MANAGER
-                                || role == UserRole.TEAM_LEAD) {
-
-                        if (!task.getProject().getOrganization().getId()
-                                        .equals(authenticatedUser.getOrganization().getId())) {
-
-                                throw new AccessDeniedException(
-                                                "You do not have access to this task");
-                        }
-
-                        return;
-                }
-
-                /*
-                 * MEMBER hanya boleh mengakses task
-                 * dari project yang dia ikuti.
-                 */
-                if (role == UserRole.MEMBER) {
+                                || role == UserRole.TEAM_LEAD
+                                || role == UserRole.MEMBER) {
 
                         boolean isProjectMember = projectMemberRepository.existsByProjectIdAndUserId(
                                         task.getProject().getId(),
@@ -106,70 +88,35 @@ public class TaskService {
                         return;
                 }
 
-                /*
-                 * Role lain tidak memiliki akses ke task.
-                 */
                 throw new AccessDeniedException(
                                 "You do not have access to this task");
         }
 
-        public List<Task> getAllTasks() {
-
-                User authenticatedUser = getAuthenticatedUser();
+        private List<Long> getAccessibleProjectIds(
+                        User authenticatedUser) {
 
                 UserRole role = authenticatedUser.getRole();
 
-                /*
-                 * SUPER_ADMIN dapat melihat seluruh task
-                 * dari semua organization.
-                 */
                 if (role == UserRole.SUPER_ADMIN) {
-                        return taskRepository.findAll();
-                }
-
-                /*
-                 * PROJECT_MANAGER dan TEAM_LEAD hanya melihat
-                 * task dari project dalam organization mereka.
-                 */
-                if (role == UserRole.PROJECT_MANAGER
-                                || role == UserRole.TEAM_LEAD) {
-
-                        Long organizationId = authenticatedUser.getOrganization().getId();
-
-                        List<Long> projectIds = projectRepository
-                                        .findByOrganizationId(organizationId)
+                        return projectRepository.findAll()
                                         .stream()
                                         .map(Project::getId)
                                         .toList();
-
-                        if (projectIds.isEmpty()) {
-                                return List.of();
-                        }
-
-                        return taskRepository.findByProjectIdIn(projectIds);
                 }
 
-                /*
-                 * MEMBER hanya melihat task dari
-                 * project yang dia ikuti.
-                 */
-                if (role == UserRole.MEMBER) {
+                if (role == UserRole.PROJECT_MANAGER
+                                || role == UserRole.TEAM_LEAD
+                                || role == UserRole.MEMBER) {
 
-                        List<Long> projectIds = projectMemberRepository
+                        return projectMemberRepository
                                         .findByUserId(authenticatedUser.getId())
                                         .stream()
                                         .map(projectMember -> projectMember.getProject().getId())
                                         .toList();
-
-                        if (projectIds.isEmpty()) {
-                                return List.of();
-                        }
-
-                        return taskRepository.findByProjectIdIn(projectIds);
                 }
 
                 throw new AccessDeniedException(
-                                "You do not have access to tasks");
+                                "You do not have access to projects");
         }
 
         @Transactional
@@ -186,6 +133,19 @@ public class TaskService {
                 }
 
                 User createdBy = getAuthenticatedUser();
+
+                if (createdBy.getRole() != UserRole.SUPER_ADMIN) {
+
+                        boolean isProjectMember = projectMemberRepository
+                                        .existsByProjectIdAndUserId(
+                                                        project.getId(),
+                                                        createdBy.getId());
+
+                        if (!isProjectMember) {
+                                throw new AccessDeniedException(
+                                                "You do not have access to this project");
+                        }
+                }
 
                 if (createdBy.getStatus() == UserStatus.INACTIVE) {
 
@@ -451,50 +411,61 @@ public class TaskService {
                 taskRepository.delete(task);
         }
 
-        public List<Task> getTasksByProjectId(Long projectId) {
+        public Page<Task> getTasksByProjectId(
+                        Long projectId,
+                        Pageable pageable) {
+
                 Project project = projectRepository.findById(projectId)
                                 .orElseThrow(() -> new NoSuchElementException("Project not found"));
 
                 User authenticatedUser = getAuthenticatedUser();
 
-                /*
-                 * SUPER_ADMIN dapat melihat task
-                 * dari project di organization mana pun.
-                 */
-                if (authenticatedUser.getRole() == UserRole.SUPER_ADMIN) {
-                        return taskRepository.findByProjectId(projectId);
-                }
+                if (authenticatedUser.getRole() != UserRole.SUPER_ADMIN) {
 
-                /*
-                 * PROJECT_MANAGER dan TEAM_LEAD hanya boleh
-                 * melihat task dari organization mereka sendiri.
-                 */
-                if (authenticatedUser.getRole() == UserRole.PROJECT_MANAGER
-                                || authenticatedUser.getRole() == UserRole.TEAM_LEAD) {
+                        boolean isProjectMember = projectMemberRepository
+                                        .existsByProjectIdAndUserId(
+                                                        project.getId(),
+                                                        authenticatedUser.getId());
 
-                        if (!project.getOrganization().getId()
-                                        .equals(authenticatedUser.getOrganization().getId())) {
-
+                        if (!isProjectMember) {
                                 throw new AccessDeniedException(
                                                 "You do not have access to this project");
                         }
-
-                        return taskRepository.findByProjectId(projectId);
                 }
 
-                /*
-                 * MEMBER hanya boleh melihat task
-                 * dari project yang dia ikuti.
-                 */
-                boolean isProjectMember = projectMemberRepository.existsByProjectIdAndUserId(
-                                project.getId(),
-                                authenticatedUser.getId());
+                return taskRepository.findByProjectId(
+                                projectId,
+                                pageable);
+        }
 
-                if (!isProjectMember) {
-                        throw new AccessDeniedException(
-                                        "You do not have access to this project");
+        public Page<Task> getTasks(
+                        String search,
+                        TaskStatus status,
+                        TaskPriority priority,
+                        Long projectId,
+                        Long assigneeId,
+                        Pageable pageable) {
+
+                User authenticatedUser = getAuthenticatedUser();
+
+                Specification<Task> specification = Specification
+                                .where(TaskSpecification.titleContains(search))
+                                .and(TaskSpecification.hasStatus(status))
+                                .and(TaskSpecification.hasPriority(priority))
+                                .and(TaskSpecification.hasProjectId(projectId))
+                                .and(TaskSpecification.hasAssigneeId(assigneeId));
+
+                if (authenticatedUser.getRole() != UserRole.SUPER_ADMIN) {
+
+                        List<Long> accessibleProjectIds = getAccessibleProjectIds(authenticatedUser);
+
+                        specification = specification.and(
+                                        TaskSpecification.projectIdIn(
+                                                        accessibleProjectIds));
                 }
 
-                return taskRepository.findByProjectId(projectId);
+                return taskRepository.findAll(
+                                specification,
+                                pageable);
         }
 }

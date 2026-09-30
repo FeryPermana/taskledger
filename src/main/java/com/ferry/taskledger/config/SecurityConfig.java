@@ -1,24 +1,24 @@
 package com.ferry.taskledger.config;
 
+import com.ferry.taskledger.security.JwtAuthenticationFilter;
+import com.ferry.taskledger.security.SecurityExceptionHandler;
+
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.web.SecurityFilterChain;
-import com.ferry.taskledger.security.JwtAuthenticationFilter;
-import com.ferry.taskledger.security.SecurityExceptionHandler;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
-import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @EnableMethodSecurity
 @Configuration
@@ -36,30 +36,54 @@ public class SecurityConfig {
         }
 
         @Bean
-        public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        public SecurityFilterChain securityFilterChain(
+                        HttpSecurity http) throws Exception {
 
-                http.csrf(csrf -> csrf.disable())
+                http
+                                .csrf(csrf -> csrf.disable())
+
                                 .sessionManagement(session -> session
-                                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                                                .sessionCreationPolicy(
+                                                                SessionCreationPolicy.STATELESS))
+
                                 .authorizeHttpRequests(auth -> auth
-                                        .requestMatchers("/api/auth/**").permitAll()
-                                        .requestMatchers("/error").permitAll()
-                                        .requestMatchers("/api/users/**")
-                                        .hasAnyRole("SUPER_ADMIN", "ADMIN")
-                                        .requestMatchers("/api/projects/**")
-                                        .hasAnyRole("SUPER_ADMIN", "PROJECT_MANAGER")
-                                        .requestMatchers("/api/tasks/**")
-                                        .hasAnyRole(
-                                                "SUPER_ADMIN",
-                                                "PROJECT_MANAGER",
-                                                "TEAM_LEAD",
-                                                "MEMBER"
-                                        )
-                                        .anyRequest().authenticated()
-                                )
+
+                                                // Public
+                                                .requestMatchers("/api/auth/**").permitAll()
+                                                .requestMatchers("/error").permitAll()
+
+                                                // User Management
+                                                .requestMatchers("/api/users/**")
+                                                .hasAnyRole(
+                                                                "SUPER_ADMIN",
+                                                                "ADMIN")
+
+                                                // Project
+                                                .requestMatchers("/api/projects/**")
+                                                .hasAnyRole(
+                                                                "SUPER_ADMIN",
+                                                                "PROJECT_MANAGER",
+                                                                "TEAM_LEAD",
+                                                                "MEMBER")
+
+                                                // Task
+                                                .requestMatchers("/api/tasks/**")
+                                                .hasAnyRole(
+                                                                "SUPER_ADMIN",
+                                                                "PROJECT_MANAGER",
+                                                                "TEAM_LEAD",
+                                                                "MEMBER")
+
+                                                // Other authenticated endpoints
+                                                .anyRequest()
+                                                .authenticated())
+
                                 .exceptionHandling(exception -> exception
-                                                .authenticationEntryPoint(securityExceptionHandler)
-                                                .accessDeniedHandler(securityExceptionHandler))
+                                                .authenticationEntryPoint(
+                                                                securityExceptionHandler)
+                                                .accessDeniedHandler(
+                                                                securityExceptionHandler))
+
                                 .addFilterBefore(
                                                 jwtAuthenticationFilter,
                                                 UsernamePasswordAuthenticationFilter.class);
@@ -71,7 +95,9 @@ public class SecurityConfig {
         public AuthenticationProvider authenticationProvider(
                         UserDetailsService userDetailsService,
                         PasswordEncoder passwordEncoder) {
-                DaoAuthenticationProvider provider = new DaoAuthenticationProvider(userDetailsService);
+
+                DaoAuthenticationProvider provider = new DaoAuthenticationProvider(
+                                userDetailsService);
 
                 provider.setPasswordEncoder(passwordEncoder);
 
@@ -81,12 +107,15 @@ public class SecurityConfig {
         @Bean
         public AuthenticationManager authenticationManager(
                         AuthenticationConfiguration authenticationConfiguration) throws Exception {
-                return authenticationConfiguration.getAuthenticationManager();
+
+                return authenticationConfiguration
+                                .getAuthenticationManager();
         }
 
         @Bean
         public FilterRegistrationBean<JwtAuthenticationFilter> jwtAuthenticationFilterRegistration(
                         JwtAuthenticationFilter filter) {
+
                 FilterRegistrationBean<JwtAuthenticationFilter> registration = new FilterRegistrationBean<>(filter);
 
                 registration.setEnabled(false);

@@ -12,68 +12,60 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/project-members")
+@RequestMapping("/api/projects/{projectId}/members")
 public class ProjectMemberController {
 
-    private final ProjectMemberService projectMemberService;
-    private final ProjectMemberMapper projectMemberMapper;
+        private final ProjectMemberService projectMemberService;
+        private final ProjectMemberMapper projectMemberMapper;
 
-    public ProjectMemberController(
-            ProjectMemberService projectMemberService,
-            ProjectMemberMapper projectMemberMapper
-    ) {
-        this.projectMemberService = projectMemberService;
-        this.projectMemberMapper = projectMemberMapper;
-    }
+        public ProjectMemberController(
+                        ProjectMemberService projectMemberService,
+                        ProjectMemberMapper projectMemberMapper) {
+                this.projectMemberService = projectMemberService;
+                this.projectMemberMapper = projectMemberMapper;
+        }
 
-    @PostMapping
-    public ApiResponse<ProjectMemberResponse> addMember(
-            @Valid @RequestBody CreateProjectMemberRequest request
-    ) {
+        @PostMapping
+        public ApiResponse<ProjectMemberResponse> addMember(
+                        @PathVariable Long projectId,
+                        @Valid @RequestBody CreateProjectMemberRequest request) {
 
-        ProjectMember projectMember =
-                projectMemberService.addMember(request);
+                ProjectMember projectMember = projectMemberService.addMember(projectId, request);
 
-        ProjectMemberResponse response =
-                projectMemberMapper.toResponse(projectMember);
+                ProjectMemberResponse response = projectMemberMapper.toResponse(projectMember);
 
-        return new ApiResponse<>(
-                201,
-                "Project member added successfully",
-                response
-        );
-    }
+                return new ApiResponse<>(
+                                201,
+                                "Project member added successfully",
+                                response);
+        }
 
-    @GetMapping("/project/{projectId}")
-    public ApiResponse<List<ProjectMemberResponse>> getMembersByProject(
-            @PathVariable Long projectId
-    ) {
+        @GetMapping
+        public ApiResponse<List<ProjectMemberResponse>> getMembersByProject(
+                        @PathVariable Long projectId) {
 
-        List<ProjectMember> members =
-                projectMemberService.getMembersByProjectId(projectId);
+                List<ProjectMember> members = projectMemberService.getMembersByProjectId(projectId);
 
-        List<ProjectMemberResponse> responses = members.stream()
-                .map(projectMemberMapper::toResponse)
-                .toList();
+                List<ProjectMemberResponse> responses = members.stream()
+                                .map(projectMemberMapper::toResponse)
+                                .toList();
 
-        return new ApiResponse<>(
-                200,
-                "Project members retrieved successfully",
-                responses
-        );
-    }
+                return new ApiResponse<>(
+                                200,
+                                "Project members retrieved successfully",
+                                responses);
+        }
 
-    @DeleteMapping("/project/{projectId}/user/{userId}")
-    public ApiResponse<Void> removeMember(
-        @PathVariable Long projectId,
-        @PathVariable Long userId
-    ) {
-        projectMemberService.removeMember(projectId, userId);
+        @DeleteMapping("/{userId}")
+        public ApiResponse<Void> removeMember(
+                        @PathVariable Long projectId,
+                        @PathVariable Long userId) {
 
-        return new ApiResponse<>(
-            200,
-            "Project member removed successfully",
-            null
-        );
-    }
+                projectMemberService.removeMember(projectId, userId);
+
+                return new ApiResponse<>(
+                                200,
+                                "Project member removed successfully",
+                                null);
+        }
 }
